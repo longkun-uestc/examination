@@ -36,3 +36,37 @@ class AscentSequence:
         return max(dp)
 ```
 
+改进方法：上述方法中，要在0~i-1的数组中寻找在A[j]<A[i]的情况下最大的F[j]。这里需要O(n)的复杂度。
+改进的思路是用一个辅助数组end来存储已经遍历到的递增子序列。
+
+当A[i]大于end[-1]时，将A[i]直接添加到end末尾，并且dp[i]=len(end)
+
+当A[i]小于等于end[-1]时，用A[i]替换end中第一个不小于A[i]的元素(假设为end[j])，并且dp[i]=j+1。
+
+由于end是一个有序的数组，所以找end中第一个不小于A[i]的元素可以用二分查找，因此复杂度降为O(logn)
+整体复杂度降为<a href="https://www.codecogs.com/eqnedit.php?latex=O(nlogn)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?O(nlogn)" title="O(nlogn)" /></a>
+
+```python
+def findLongest1(self, A, n):
+    if len(A) == 0:
+        return 0
+    ends = [A[0]]
+    dp = [1] * n
+    for i in range(1, n):
+        l, r = (0, len(ends) - 1)
+        while l <= r:
+            mid = (l + r) // 2
+            if A[i] < ends[mid]:
+                r = mid - 1
+            elif A[i] == ends[mid]:
+                l = mid
+                break
+            else:
+                l = mid + 1
+        if l < len(ends):
+            ends[l] = A[i]
+        else:
+            ends.append(A[i])
+        dp[i] = l + 1
+    return max(dp)
+```
