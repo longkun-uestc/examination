@@ -15,6 +15,7 @@
 令<a href="https://www.codecogs.com/eqnedit.php?latex=F[i]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?F[i]" title="F[i]" /></a>
 表示以<a href="https://www.codecogs.com/eqnedit.php?latex=A[i]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?A[i]" title="A[i]" /></a>
 结尾的最长递增子序列的长度。那么：
+
 <a href="https://www.codecogs.com/eqnedit.php?latex=F[i]=\left\{\begin{matrix}&space;max(F[j]&space;&plus;&space;1)&space;&&space;j<i,&space;A[j]<A[i]&space;\\&space;1&space;&&space;A[i]<min(A[0],...,A[i-1])&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?F[i]=\left\{\begin{matrix}&space;max(F[j]&space;&plus;&space;1)&space;&&space;j<i,&space;A[j]<A[i]&space;\\&space;1&space;&&space;A[i]<min(A[0],...,A[i-1])&space;\end{matrix}\right." title="F[i]=\left\{\begin{matrix} max(F[j] + 1) & j<i, A[j]<A[i] \\ 1 & A[i]<min(A[0],...,A[i-1]) \end{matrix}\right." /></a>
 
 这种算法的复杂度是<a href="https://www.codecogs.com/eqnedit.php?latex=O(n^{2})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?O(n^{2})" title="O(n^{2})" /></a>。
