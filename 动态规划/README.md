@@ -84,7 +84,7 @@ def findLongest1(self, A, n):
 ~~~
 返回：6
 ~~~
-# 最优子结构
+## 最优子结构
 令C[i，j]表示长度为i和j的字符串的最长公共子序列。那么：
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=C[i,j]=\left\{\begin{matrix}&space;C[i-1][j-1]&plus;1&space;&&space;A[i]=B[j]\\&space;max(C[i-1][j],C[i][j-1],C[i-1][j-1])&space;&&space;A[i]!=B[j]\\&space;0&space;&&space;i=0&space;or&space;j=0&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?C[i,j]=\left\{\begin{matrix}&space;C[i-1][j-1]&plus;1&space;&&space;A[i]=B[j]\\&space;max(C[i-1][j],C[i][j-1],C[i-1][j-1])&space;&&space;A[i]!=B[j]\\&space;0&space;&&space;i=0&space;or&space;j=0&space;\end{matrix}\right." title="C[i,j]=\left\{\begin{matrix} C[i-1][j-1]+1 & A[i]=B[j]\\ max(C[i-1][j],C[i][j-1],C[i-1][j-1]) & A[i]!=B[j]\\ 0 & i=0 or j=0 \end{matrix}\right." /></a>
@@ -116,7 +116,7 @@ class LCS:
 ~~~
 返回：4
 ~~~
-# 最优子结构
+## 最优子结构
 这个题与上题的不同之处在于，本题要求的字符串是连续的，条件更严格。因此：
 设C[i,j]为分别以A[i],B[j]结尾的字符串的最长公共子串的长度，那么：
 <a href="https://www.codecogs.com/eqnedit.php?latex=C[i,j]=\left\{\begin{matrix}&space;C[i-1][j-1]&plus;1&space;&&space;A[i]=B[j]\\&space;0&space;&&space;A[i]!=B[j]\\&space;0&space;&&space;i=0&space;or&space;j=0&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?C[i,j]=\left\{\begin{matrix}&space;C[i-1][j-1]&plus;1&space;&&space;A[i]=B[j]\\&space;0&space;&&space;A[i]!=B[j]\\&space;0&space;&&space;i=0&space;or&space;j=0&space;\end{matrix}\right." title="C[i,j]=\left\{\begin{matrix} C[i-1][j-1]+1 & A[i]=B[j]\\ 0 & A[i]!=B[j]\\ 0 & i=0 or j=0 \end{matrix}\right." /></a>
@@ -150,7 +150,7 @@ class LongestSubstring:
 ~~~
 返回：8
 ~~~
-# 最优子结构
+## 最优子结构
 设C[i,j]为将长度为i的字符串A编辑为长度为j的字符串B的代价。
 那么：
 
