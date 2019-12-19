@@ -176,3 +176,62 @@ class MinCost:
         # print(C[n][m])
         return C[n][m]
 ```
+
+# 字符串交错组成
+对于三个字符串A，B，C。我们称C由A和B交错组成当且仅当C包含且仅包含A，B中所有字符，且对应的顺序不改变。请编写一个高效算法，判断C串是否由A和B交错组成。
+
+给定三个字符串A,B和C，及他们的长度。请返回一个bool值，代表C是否由A和B交错组成。保证三个串的长度均小于等于100。
+
+测试样例：
+~~~
+"ABC",3,"12C",3,"A12BCC",6
+~~~
+~~~
+返回：true
+~~~
+##最优子结构
+设M[i,j]表示由A[1-i]和B[1-j]是否能组成C[i+j]的判别结果。
+那么：
+<a href="https://www.codecogs.com/eqnedit.php?latex=M[i,j]=\left\{\begin{matrix}&space;M[i-1][j]&space;or&space;M[i][j-1]&space;&&space;C[i&plus;j]=A[i]=B[j]\\&space;False&space;&&space;C[i&plus;j]!=A[i]=B[j]\\&space;M[i-1][j]&space;&&space;C[i&plus;j]=A[i]!=B[j]\\&space;M[i][j-1]&space;&&space;C[i&plus;j]=B[j]&space;!=A[i]\\&space;False&space;&&space;C[i&plus;j]&space;!=A[i]!=B[j]&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?M[i,j]=\left\{\begin{matrix}&space;M[i-1][j]&space;or&space;M[i][j-1]&space;&&space;C[i&plus;j]=A[i]=B[j]\\&space;False&space;&&space;C[i&plus;j]!=A[i]=B[j]\\&space;M[i-1][j]&space;&&space;C[i&plus;j]=A[i]!=B[j]\\&space;M[i][j-1]&space;&&space;C[i&plus;j]=B[j]&space;!=A[i]\\&space;False&space;&&space;C[i&plus;j]&space;!=A[i]!=B[j]&space;\end{matrix}\right." title="M[i,j]=\left\{\begin{matrix} M[i-1][j] or M[i][j-1] & C[i+j]=A[i]=B[j]\\ False & C[i+j]!=A[i]=B[j]\\ M[i-1][j] & C[i+j]=A[i]!=B[j]\\ M[i][j-1] & C[i+j]=B[j] !=A[i]\\ False & C[i+j] !=A[i]!=B[j] \end{matrix}\right." /></a>
+
+代码如下：
+```python
+class Mixture:
+    def chkMixture(self, A, n, B, m, C, v):
+        if n == 0 and m == 0 and v == 0:
+            return True
+        if n == 0 and B != C:
+            return False
+        if m == 0 and A != C:
+            return False
+        if n == 0 and m == 0 and v != 0:
+            return False
+        if v != n + m:
+            return False
+        M = [[False for j in range(m + 1)] for i in range(n + 1)]
+        for i in range(1, n + 1):
+            if A[i-1] == C[i-1]:
+                M[i][0] = True
+        for j in range(1, m + 1):
+            if B[j-1] == C[j-1]:
+                M[0][j] = True
+        M[0][0] = True
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                if A[i - 1] == B[j - 1]:
+                    if C[i + j - 1] == A[i - 1]:
+                        M[i][j] = M[i][j - 1] or M[i - 1][j]
+                    else:
+                        M[i][j] = False
+                else:
+                    if C[i + j - 1] == A[i - 1]:
+                        M[i][j] = M[i - 1][j]
+                    elif C[i + j - 1] == B[j - 1]:
+                        M[i][j] = M[i][j - 1]
+                    else:
+                        M[i][j] = False
+        for a in M:
+            print(a)
+        print(M[n][m])
+        return M[n][m]
+```
