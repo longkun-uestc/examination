@@ -358,5 +358,100 @@ class Expression:
         return C[ret][0][var_len-1] % 10007
 ```
 
+#纸牌博弈
+有一个整型数组A，代表数值不同的纸牌排成一条线。玩家a和玩家b依次拿走每张纸牌，规定玩家a先拿，玩家B后拿，但是每个玩家每次只能拿走最左或最右的纸牌，玩家a和玩家b都绝顶聪明，他们总会采用最优策略。请返回最后获胜者的分数。
+
+给定纸牌序列A及序列的大小n，请返回最后分数较高者得分数(相同则返回任意一个分数)。保证A中的元素均小于等于1000。且A的大小小于等于300。
+
+测试样例：
+~~~
+[1,2,100,4],4
+~~~
+~~~
+返回：101
+~~~
+## 最优子结构
+这个题中，A和B每次有两种选择(拿左边还是拿右边)。同样是区间动态规划的思想
+
+设C[i,j]表示当前要拿牌的人从牌序列S[i~j]中拿了一张牌后，获得的最大值。
+
+当前拿牌的人(假设为A)可以选择拿左边，也可以拿右边。如果他选择拿左边，那么另外一个人B就会从S[i+1~j]的序列中拿牌，
+他也可以选择拿左边还是拿右边。再轮到A拿牌时，他就只能在长度为j-i-1的序列中拿牌了。
+
+所以C[i,j]的最大值有如下四种可能：
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=C[i,j]=max(C[i&plus;2,j]&plus;c_{l},C[i&plus;1,j-1]&plus;c_{l},&space;C[i,&space;j-2]&plus;c_{r},&space;C[i&plus;1,&space;j-1]&plus;c_{r})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?C[i,j]=max(C[i&plus;2,j]&plus;c_{l},C[i&plus;1,j-1]&plus;c_{l},&space;C[i,&space;j-2]&plus;c_{r},&space;C[i&plus;1,&space;j-1]&plus;c_{r})" title="C[i,j]=max(C[i+2,j]+c_{l},C[i+1,j-1]+c_{l}, C[i, j-2]+c_{r}, C[i+1, j-1]+c_{r})" /></a>
+
+但是问题的关键在于B只会选择让他最优的那种情况。因此C[i,j]可能的选择就从4种降到了2种。
+
+那么如何知道B选择的是左边还是右边呢？可以另增一个记号数组来记录B选择的方向。
+
+令F[i,j]表示当前从i~j子串中选择的人选择的方向。
+
+递推表达式如下：
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=C[i,j]&space;=&space;\left\{\begin{matrix}&space;S[i,i]&space;&&space;if&space;\quad&space;i=j&space;\\&space;max(S[i,i],&space;S[i,i&plus;1])&space;&&space;if&space;j=i&plus;1\\&space;max(left,&space;right)&space;&&space;if&space;j>&space;i&plus;1\\&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?C[i,j]&space;=&space;\left\{\begin{matrix}&space;S[i,i]&space;&&space;if&space;\quad&space;i=j&space;\\&space;max(S[i,i],&space;S[i,i&plus;1])&space;&&space;if&space;j=i&plus;1\\&space;max(left,&space;right)&space;&&space;if&space;j>&space;i&plus;1\\&space;\end{matrix}\right." title="C[i,j] = \left\{\begin{matrix} S[i,i] & if \quad i=j \\ max(S[i,i], S[i,i+1]) & if j=i+1\\ max(left, right) & if j> i+1\\ \end{matrix}\right." /></a>
+
+其中：
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=left&space;=&space;S_{i}&plus;C[i&plus;2,j]\quad&space;if&space;\quad&space;F[i&plus;1,j]=L&space;\quad&space;else&space;\quad&space;S_{i}&plus;C[i&plus;1,j-1]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?left&space;=&space;S_{i}&plus;C[i&plus;2,j]\quad&space;if&space;\quad&space;F[i&plus;1,j]=L&space;\quad&space;else&space;\quad&space;S_{i}&plus;C[i&plus;1,j-1]" title="left = S_{i}+C[i+2,j]\quad if \quad F[i+1,j]=L \quad else \quad S_{i}+C[i+1,j-1]" /></a>
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=right&space;=&space;S_{j}&plus;C[i&plus;1,j-1]\quad&space;if&space;\quad&space;F[i,j-1]=L&space;\quad&space;else&space;\quad&space;S_{j}&plus;C[i,j-2]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?right&space;=&space;S_{j}&plus;C[i&plus;1,j-1]\quad&space;if&space;\quad&space;F[i,j-1]=L&space;\quad&space;else&space;\quad&space;S_{j}&plus;C[i,j-2]" title="right = S_{j}+C[i+1,j-1]\quad if \quad F[i,j-1]=L \quad else \quad S_{j}+C[i,j-2]" /></a>
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=F[i,j]=\left\{\begin{matrix}&space;L&space;&&space;,if&space;\quad&space;i=j\\&space;L\quad&space;if&space;\quad&space;S[i]\geqslant&space;S[j]&space;\quad&space;else&space;\quad&space;R&space;&&space;,if&space;\quad&space;j=i&plus;1&space;\\&space;L&space;\quad&space;if&space;\quad&space;left&space;\geqslant&space;right&space;\quad&space;else&space;\quad&space;R&space;&&space;,otherwise&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?F[i,j]=\left\{\begin{matrix}&space;L&space;&&space;,if&space;\quad&space;i=j\\&space;L\quad&space;if&space;\quad&space;S[i]\geqslant&space;S[j]&space;\quad&space;else&space;\quad&space;R&space;&&space;,if&space;\quad&space;j=i&plus;1&space;\\&space;L&space;\quad&space;if&space;\quad&space;left&space;\geqslant&space;right&space;\quad&space;else&space;\quad&space;R&space;&&space;,otherwise&space;\end{matrix}\right." title="F[i,j]=\left\{\begin{matrix} L & ,if \quad i=j\\ L\quad if \quad S[i]\geqslant S[j] \quad else \quad R & ,if \quad j=i+1 \\ L \quad if \quad left \geqslant right \quad else \quad R & ,otherwise \end{matrix}\right." /></a>
+
+代码如下：
+```python
+class Cards:
+    def cardGame(self, A, n):
+        if n <= 0:
+            return 0
+        M = [[0 for i in range(n)] for j in range(n)]
+        F = [["0" for i in range(n)] for j in range(n)]
+        for i in range(n):
+            M[i][i] = A[i]
+            F[i][i] = "L"
+        for i in range(n - 1):
+            if A[i] > A[i + 1]:
+                M[i][i + 1] = A[i]
+                F[i][i + 1] = "L"
+            else:
+                M[i][i + 1] = A[i + 1]
+                F[i][i + 1] = "R"
+        for r in range(3, n + 1):
+            for i in range(n - r + 1):
+                j = i + r - 1
+                if F[i + 1][j] == "L":
+                    left = A[i] + M[i + 2][j]
+                else:
+                    left = A[i] + M[i + 1][j - 1]
+                if F[i][j - 1] == "L":
+                    right = A[j] + M[i + 1][j - 1]
+                else:
+                    right = A[j] + M[i][j - 2]
+
+                if left >= right:
+                    M[i][j] = left
+                    F[i][j] = "L"
+                else:
+                    M[i][j] = right
+                    F[i][j] = "R"
+        # print("-----------------------")
+        # for m in M:
+        #     print(m)
+        # for f in F:
+        #     print(f)
+        a = M[0][n - 1]
+        b = sum(A) - a
+        result = a if a > b else b
+        print(result)
+        return result
+```
+
+
+
+
+
+
 
 
