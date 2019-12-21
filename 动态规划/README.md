@@ -359,6 +359,7 @@ class Expression:
 ```
 
 #纸牌博弈
+
 有一个整型数组A，代表数值不同的纸牌排成一条线。玩家a和玩家b依次拿走每张纸牌，规定玩家a先拿，玩家B后拿，但是每个玩家每次只能拿走最左或最右的纸牌，玩家a和玩家b都绝顶聪明，他们总会采用最优策略。请返回最后获胜者的分数。
 
 给定纸牌序列A及序列的大小n，请返回最后分数较高者得分数(相同则返回任意一个分数)。保证A中的元素均小于等于1000。且A的大小小于等于300。
@@ -376,7 +377,8 @@ class Expression:
 设C[i,j]表示当前要拿牌的人从牌序列S[i~j]中拿了一张牌后，获得的最大值。
 
 当前拿牌的人(假设为A)可以选择拿左边，也可以拿右边。如果他选择拿左边，那么另外一个人B就会从S[i+1~j]的序列中拿牌，
-他也可以选择拿左边还是拿右边。再轮到A拿牌时，他就只能在长度为j-i-1的序列中拿牌了。
+他也可以选择拿左边还是拿右边。再轮到A拿牌时，他就只能在长度为j-i-1的序列中拿牌了。他有4种可能：B选左边，他可以选左或右;B
+选右边，他也可以选左或右。
 
 所以C[i,j]的最大值有如下四种可能：
 
@@ -447,6 +449,86 @@ class Cards:
         print(result)
         return result
 ```
+
+# 字符串通配
+对于字符串A，其中绝对不含有字符’.’和’*’。再给定字符串B，其中可以含有’.’或’*’，’*’字符不能是B的首字符，并且任意两个’*’字符不相邻。exp中的’.’代表任何一个字符，B中的’*’表示’*’的前一个字符可以有0个或者多个。请写一个函数，判断A是否能被B匹配。
+
+给定两个字符串A和B,同时给定两个串的长度lena和lenb，请返回一个bool值代表能否匹配。保证两串的长度均小于等于300。
+
+测试样例：
+~~~
+"abcd",4,".*",2
+~~~
+~~~
+返回：true
+~~~
+
+## 最优子结构
+
+设C[i,j]表示是否能用字符串Bj匹配Ai的bool值。那么存在如下三种情况。
+
+1.A[i]=B[j] or B[j]="."
+
+2.A[i]!=B[j] and B[j]!="*"
+
+3.B[j]="*"
+
+对于情况1，C[i,j]=C[i-1,j-1]。对于情况2，C[i,j]=False。对于情况3，要考虑*到底代替了几个B[j-1]。它可以代替0个，1个或多个B[j-1]
+。当代替0个时，C[i,j]=C[i,j-2]。当代替1个时，C[i,j]=C[i,j-1]。当代替多个时， 要考虑Ai是否等于B[j-1]，如果相等，C[i,j]=C[i-1,j],
+如果不等，C[i,j]=False。
+
+因此，递推表达式为：
+
+当i>0并且j>0时：
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=C[i,j]=\left\{\begin{matrix}&space;C[i-1,j-1]&space;&,&space;A_{i}=B_{j}&space;\quad&space;or&space;\quad&space;B_{j}="."&space;,i>0,&space;j>0\\&space;False&space;&,&space;A_{i}!=B_{j}&space;\quad&space;and&space;\quad&space;B_{j}!="*"&space;\\&space;\begin{Bmatrix}&space;C[i,j-2]&space;&,&space;"*"&space;\quad&space;repalce&space;\quad&space;0&space;\quad&space;B_{j-1}&space;\\&space;or&space;\quad&space;C[i,j-1]&space;&,&space;"*"&space;\quad&space;repalce&space;\quad&space;1&space;\quad&space;B_{j-1}\\&space;or&space;\quad&space;(C[i-1,&space;j]&space;\quad&space;if&space;A_{i-1}=B_{j-1}&space;\quad&space;or&space;\quad&space;B_{j-1}="."&space;\quad&space;else&space;\quad&space;False)&space;&,&space;"*"&space;\quad&space;repalce&space;\quad&space;multiple&space;\quad&space;B_{j-1}&space;\end{Bmatrix}&,&space;B_{j}="*"&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?C[i,j]=\left\{\begin{matrix}&space;C[i-1,j-1]&space;&,&space;A_{i}=B_{j}&space;\quad&space;or&space;\quad&space;B_{j}="."&space;,i>0,&space;j>0\\&space;False&space;&,&space;A_{i}!=B_{j}&space;\quad&space;and&space;\quad&space;B_{j}!="*"&space;\\&space;\begin{Bmatrix}&space;C[i,j-2]&space;&,&space;"*"&space;\quad&space;repalce&space;\quad&space;0&space;\quad&space;B_{j-1}&space;\\&space;or&space;\quad&space;C[i,j-1]&space;&,&space;"*"&space;\quad&space;repalce&space;\quad&space;1&space;\quad&space;B_{j-1}\\&space;or&space;\quad&space;(C[i-1,&space;j]&space;\quad&space;if&space;A_{i-1}=B_{j-1}&space;\quad&space;or&space;\quad&space;B_{j-1}="."&space;\quad&space;else&space;\quad&space;False)&space;&,&space;"*"&space;\quad&space;repalce&space;\quad&space;multiple&space;\quad&space;B_{j-1}&space;\end{Bmatrix}&,&space;B_{j}="*"&space;\end{matrix}\right." title="C[i,j]=\left\{\begin{matrix} C[i-1,j-1] &, A_{i}=B_{j} \quad or \quad B_{j}="." ,i>0, j>0\\ False &, A_{i}!=B_{j} \quad and \quad B_{j}!="*" \\ \begin{Bmatrix} C[i,j-2] &, "*" \quad repalce \quad 0 \quad B_{j-1} \\ or \quad C[i,j-1] &, "*" \quad repalce \quad 1 \quad B_{j-1}\\ or \quad (C[i-1, j] \quad if A_{i-1}=B_{j-1} \quad or \quad B_{j-1}="." \quad else \quad False) &, "*" \quad repalce \quad multiple \quad B_{j-1} \end{Bmatrix}&, B_{j}="*" \end{matrix}\right." /></a>
+
+边界条件为：
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=C[i,j]=\left\{\begin{matrix}&space;True&space;&&space;,i=j=0\\&space;False&space;&&space;,j=0&space;\quad&space;and&space;\quad&space;i!=0\\&space;False&space;&&space;,i=0&space;\quad&space;and&space;\quad&space;j=1&space;\\&space;C[i][j-2]&space;\quad&space;if&space;B_{j}="*"&space;\quad&space;else&space;\quad&space;False&space;&&space;,&space;i=0\quad&space;and&space;\quad&space;j>0&space;\\&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?C[i,j]=\left\{\begin{matrix}&space;True&space;&&space;,i=j=0\\&space;False&space;&&space;,j=0&space;\quad&space;and&space;\quad&space;i!=0\\&space;False&space;&&space;,i=0&space;\quad&space;and&space;\quad&space;j=1&space;\\&space;C[i][j-2]&space;\quad&space;if&space;B_{j}="*"&space;\quad&space;else&space;\quad&space;False&space;&&space;,&space;i=0\quad&space;and&space;\quad&space;j>0&space;\\&space;\end{matrix}\right." title="C[i,j]=\left\{\begin{matrix} True & ,i=j=0\\ False & ,j=0 \quad and \quad i!=0\\ False & ,i=0 \quad and \quad j=1 \\ C[i][j-2] \quad if B_{j}="*" \quad else \quad False & , i=0\quad and \quad j>0 \\ \end{matrix}\right." /></a>
+
+代码如下：
+```python
+class WildMatch:
+    def chkWildMatch(self, A, lena, B, lenb):
+        if lenb == 0 and lena > 0:
+            return False
+        if lena == 0 and lenb == 0:
+            return True
+        C = [[False for j in range(lenb+1)] for i in range(lena+1)]
+        C[0][0] = True
+        C[0][1] = False
+        for i in range(1, lena+1):
+            C[i][0] = False
+        for j in range(2, lenb+1):
+            if B[j-1] == "*":
+                C[0][j] = C[0][j-2]
+            else:
+                C[0][j] = False
+        for c in C:
+            print(c)
+        for i in range(1, lena+1):
+            for j in range(1, lenb+1):
+                if A[i-1]==B[j-1] or B[j-1] == ".":
+                    C[i][j] = C[i-1][j-1]
+                elif A[i-1] != B[j-1] and B[j-1] != "*":
+                    C[i][j] = False
+                elif B[j-1] == "*":
+                    a = C[i][j-2]  # 产生0个
+                    b = C[i][j-1]  # 产生1个
+                    c = C[i-1][j] if A[i-1] == B[j-2] or B[j-2] == "." else False  # 产生多个。如果A的当前字符和B的前一个字符不相等，直接为False, 否则B不变，A前移一个字符
+                    C[i][j] = a or b or c  # 最终结果为3种情况选1
+                else:
+                    print("error")  # 永远不会进这个分支
+                    exit()
+        print("---------------------------------")
+        for c in C:
+            print(c)
+        print(C[lena][lenb])
+        return C[lena][lenb]
+```
+
+
 
 
 
