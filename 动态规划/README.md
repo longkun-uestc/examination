@@ -479,6 +479,14 @@ class Cards:
 
 因此，递推表达式为：
 
+当i>0并且j>0时：
+
+![avatar](../images/字符串通配_递推关系.jpg)
+
+边界条件为：
+
+![avatar](../images/字符串通配_边界条件.jpg)
+
 代码如下：
 ```python
 class WildMatch:
