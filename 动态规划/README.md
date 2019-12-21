@@ -235,3 +235,128 @@ class Mixture:
         print(M[n][m])
         return M[n][m]
 ```
+
+# 矩阵连乘
+给定n个矩阵｛A1, A2, …, An｝，Ai的维数为pi-1×pi，Ai与Ai+1是可乘的，i=1,2 ,…,n-1。如何确定计算矩阵连乘积的计算次序，使得依此次序计算矩阵连乘积需要的数乘次数最少
+
+## 最优子结构
+设M[i,j]表示从Ai到Aj做乘法需要的最小步数。那么原问题相当于求解M[1, n]
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=M[i,j]&space;=&space;\left\{\begin{matrix}&space;0&space;&i=j&space;\\&space;min_{i\leqslant&space;k<j}(M[i,k]&plus;M[k&plus;1,j]&plus;P[i,0]*P[k,1]*P[j,&space;1])&space;&&space;i!=j&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?M[i,j]&space;=&space;\left\{\begin{matrix}&space;0&space;&i=j&space;\\&space;min_{i\leqslant&space;k<j}(M[i,k]&plus;M[k&plus;1,j]&plus;P[i,0]*P[k,1]*P[j,&space;1])&space;&&space;i!=j&space;\end{matrix}\right." title="M[i,j] = \left\{\begin{matrix} 0 &i=j \\ min_{i\leqslant k<j}(M[i,k]+M[k+1,j]+P[i,0]*P[k,1]*P[j, 1]) & i!=j \end{matrix}\right." /></a>
+
+代码如下：
+```python
+class Solution:
+    def matrix_multiply(self, matrix_list):
+        if len(matrix_list) == 0:
+            return 0
+        n = len(matrix_list)
+        M = [[0 for i in range(n)] for j in range(n)]
+        for r in range(2, n+1):
+            for i in range(n - r + 1):
+                left = matrix_list[i]
+                j = i+r-1
+                right = matrix_list[j]
+                M[i][j] = min([M[i][k] + M[k + 1][j] + left[0] * matrix_list[k][1] * right[1] for k in range(i, j)])
+        for m in M:
+            print(m)
+        return M[0][n-1]
+```
+# 表达式组成方案
+对于一个只由0(假)、1(真)、&(逻辑与)、|(逻辑或)和^(异或)五种字符组成的逻辑表达式，再给定一个结果值。现在可以对这个没有括号的表达式任意加合法的括号，返回得到能有多少种加括号的方式，可以达到这个结果。
+
+给定一个字符串表达式exp及它的长度len，同时给定结果值ret,请返回方案数。保证表达式长度小于等于300。为了防止溢出，请返回答案Mod 10007的值。
+
+测试样例：
+~~~
+"1^0|0|1",7,0
+~~~
+~~~
+返回：2
+~~~
+## 最优子结构
+这道题和上面的矩阵连乘类似。使用区间动态规划的方法。
+由于这里存在两种情况(ret=0, 或ret=1)，因此需要使用两个数组来记录中间过程，并且这两个数组互相会受对方的影响。
+
+令B[i,j]表示从第i个bool变量到第j个bool变量的子串用加括号的方式使结果为1的方法数
+
+令C[i,j]表示从第i个bool变量到第j个bool变量的子串用加括号的方式使结果为0的方法数
+
+那么最终输出的结果为：
+```python
+result = B[0][n] if ret == 1 else C[0][n]
+```
+以B[i,j]为例进行分析：要计算子串exp[i,j]加括号使之为1的方法数，可以将其分为两个部分[i,k]和[k+1, j]
+然后看这两部分用什么符号连接的，然后再根据符号计算每个部分为0或者为1的方法数。
+
+令数组A为字符串exp中提取出来的bool变量，数组op为字符串中提取出的操作符。那么len(A)+len(op)=len(exp)并且len(A)=len(op)+1
+
+那么B[i,j]和C[i,j]的递推表达式为：
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=B[i,j]=\left\{\begin{matrix}&space;0&space;&&space;,if&space;\quad&space;i=j&space;\quad&space;and&space;\quad&space;A[i]=0&space;\\&space;1&space;&&space;,if&space;\quad&space;i=j&space;\quad&space;and&space;\quad&space;A[i]=1&space;\\&space;\sum&space;count1_{k}&space;&&space;for&space;\quad&space;k&space;\quad&space;in&space;\quad&space;range(i,j)&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?B[i,j]=\left\{\begin{matrix}&space;0&space;&&space;,if&space;\quad&space;i=j&space;\quad&space;and&space;\quad&space;A[i]=0&space;\\&space;1&space;&&space;,if&space;\quad&space;i=j&space;\quad&space;and&space;\quad&space;A[i]=1&space;\\&space;\sum&space;count1_{k}&space;&&space;for&space;\quad&space;k&space;\quad&space;in&space;\quad&space;range(i,j)&space;\end{matrix}\right." title="B[i,j]=\left\{\begin{matrix} 0 & ,if \quad i=j \quad and \quad A[i]=0 \\ 1 & ,if \quad i=j \quad and \quad A[i]=1 \\ \sum count1_{k} & for \quad k \quad in \quad range(i,j) \end{matrix}\right." /></a>
+
+其中：
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=count1_{k}=\left\{\begin{matrix}&space;B[i,k]*B[k&plus;1,j]&space;&&space;if&space;\quad&space;op[k]==$\&$\\&space;B[i,k]*C[k&plus;1,j]&plus;C[i,k]*B[k&plus;1,j]&plus;B[i,k]*B[k&plus;1,j]&space;&&space;if&space;\quad&space;op[k]==$\|$\\&space;B[i,k]*C[k&plus;1,j]&plus;C[i,k]*B[k&plus;1,j]&&space;if\quad&space;op[k]==&space;\oplus&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?count1_{k}=\left\{\begin{matrix}&space;B[i,k]*B[k&plus;1,j]&space;&&space;if&space;\quad&space;op[k]==$\&$\\&space;B[i,k]*C[k&plus;1,j]&plus;C[i,k]*B[k&plus;1,j]&plus;B[i,k]*B[k&plus;1,j]&space;&&space;if&space;\quad&space;op[k]==$\|$\\&space;B[i,k]*C[k&plus;1,j]&plus;C[i,k]*B[k&plus;1,j]&&space;if\quad&space;op[k]==&space;\oplus&space;\end{matrix}\right." title="count1_{k}=\left\{\begin{matrix} B[i,k]*B[k+1,j] & if \quad op[k]==$\&$\\ B[i,k]*C[k+1,j]+C[i,k]*B[k+1,j]+B[i,k]*B[k+1,j] & if \quad op[k]==$\|$\\ B[i,k]*C[k+1,j]+C[i,k]*B[k+1,j]& if\quad op[k]== \oplus \end{matrix}\right." /></a>
+
+C[i,j]的公式同理
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=C[i,j]=\left\{\begin{matrix}&space;1&space;&&space;,if&space;\quad&space;i=j&space;\quad&space;and&space;\quad&space;A[i]=0&space;\\&space;0&space;&&space;,if&space;\quad&space;i=j&space;\quad&space;and&space;\quad&space;A[i]=1&space;\\&space;\sum&space;count0_{k}&space;&&space;for&space;\quad&space;k&space;\quad&space;in&space;\quad&space;range(i,j)&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?C[i,j]=\left\{\begin{matrix}&space;1&space;&&space;,if&space;\quad&space;i=j&space;\quad&space;and&space;\quad&space;A[i]=0&space;\\&space;0&space;&&space;,if&space;\quad&space;i=j&space;\quad&space;and&space;\quad&space;A[i]=1&space;\\&space;\sum&space;count0_{k}&space;&&space;for&space;\quad&space;k&space;\quad&space;in&space;\quad&space;range(i,j)&space;\end{matrix}\right." title="C[i,j]=\left\{\begin{matrix} 1 & ,if \quad i=j \quad and \quad A[i]=0 \\ 0 & ,if \quad i=j \quad and \quad A[i]=1 \\ \sum count0_{k} & for \quad k \quad in \quad range(i,j) \end{matrix}\right." /></a>
+
+其中
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=count0_{k}=\left\{\begin{matrix}&space;C[i,k]*B[k&plus;1,j]&plus;B[i,k]*C[k&plus;1,j]&plus;C[i,k]*C[k&plus;1,j]&space;&&space;if&space;\quad&space;op[k]==$\&$\\&space;C[i,k]*C[k&plus;1,j]&space;&&space;if&space;\quad&space;op[k]==$\|$\\&space;B[i,k]*B[k&plus;1,j]&plus;C[i,k]*C[k&plus;1,j]&&space;if\quad&space;op[k]==&space;\oplus&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?count0_{k}=\left\{\begin{matrix}&space;C[i,k]*B[k&plus;1,j]&plus;B[i,k]*C[k&plus;1,j]&plus;C[i,k]*C[k&plus;1,j]&space;&&space;if&space;\quad&space;op[k]==$\&$\\&space;C[i,k]*C[k&plus;1,j]&space;&&space;if&space;\quad&space;op[k]==$\|$\\&space;B[i,k]*B[k&plus;1,j]&plus;C[i,k]*C[k&plus;1,j]&&space;if\quad&space;op[k]==&space;\oplus&space;\end{matrix}\right." title="count0_{k}=\left\{\begin{matrix} C[i,k]*B[k+1,j]+B[i,k]*C[k+1,j]+C[i,k]*C[k+1,j] & if \quad op[k]==$\&$\\ C[i,k]*C[k+1,j] & if \quad op[k]==$\|$\\ B[i,k]*B[k+1,j]+C[i,k]*C[k+1,j]& if\quad op[k]== \oplus \end{matrix}\right." /></a>
+
+写代码时，可以将B和C整合成一个三维数组。代码如下：
+```python
+class Expression:
+    def countWays(self, exp, len, ret):
+        if len == 0:
+            return 0
+        var = []
+        op = []
+        for i in range(len):
+            if i % 2 == 0:
+                var.append(exp[i])
+            else:
+                op.append(exp[i])
+        var_len = len // 2 + 1
+        B = [[0 for i in range(var_len)] for j in range(var_len)]
+        A = [[0 for i in range(var_len)] for j in range(var_len)]
+        C = [B, A]
+        for i in range(var_len):
+            if var[i] == "0":
+                C[0][i][i] = 1
+            elif var[i] == "1":
+                C[1][i][i] = 1
+        for r in range(2, var_len+1):
+            for i in range(var_len - r + 1):
+                j = i + r - 1
+                min_count_0 = 0
+                min_count_1 = 0
+                for k in range(i, j):
+                    if op[k] == "&":
+                        count_0 = C[0][i][k] * C[1][k+1][j] + C[1][i][k] * C[0][k+1][j] + C[0][i][k] * C[0][k+1][j]  # 0&1, 1&0, 0&0 = 0
+                        count_1 = C[1][i][k] * C[1][k+1][j]  # 1&1 = 1
+                    elif op[k] == "|":
+                        count_0 = C[0][i][k] * C[0][k+1][j]  # 0|0 = 0
+                        count_1 = C[1][i][k] * C[0][k+1][j] + C[0][i][k] * C[1][k+1][j] + C[1][i][k] * C[1][k+1][j]  # 1|0, 0|1, 1|1 = 1
+                    else:
+                        count_0 = C[0][i][k] * C[0][k+1][j] + C[1][i][k] * C[1][k+1][j]  # 0^0, 1^1 = 0
+                        count_1 = C[0][i][k] * C[1][k+1][j] + C[1][i][k] * C[0][k+1][j]  # 0^1, 1^0 = 1
+                    min_count_0 += count_0
+                    min_count_1 += count_1
+                C[0][i][j] = min_count_0
+                C[1][i][j] = min_count_1
+        # print("0---------")
+        # for n in range(var_len):
+        #     print(C[0][n])
+        # print("1---------")
+        # for n in range(var_len):
+        #     print(C[1][n])
+        # print(C[ret][0][var_len-1])
+        return C[ret][0][var_len-1] % 10007
+```
+
+
+
