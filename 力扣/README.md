@@ -1,8 +1,11 @@
 # 力扣网刷图记录
+
 #扰乱字符串
+
 题目详细描述见[这里](https://leetcode-cn.com/problems/scramble-string/)
 
 #解题思路
+
 ##1.递归解法
 
 与二叉树相关，可以从递归的思路入手。
@@ -32,6 +35,7 @@ def isScramble(self, s1: str, s2: str) -> bool:
         else:
             return False
 ```
+
 ##2.动态规划
 
 在上面的递归解法中，for循环部分重复求解了很多相同的子问题。因此可以考虑使用动态规划来求解。
