@@ -90,33 +90,3 @@ if __name__ == '__main__':
     # s3 = "aa"
     a = s.isInterleave(s1, s2, s3)
     print(a)
-
-
-def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
-    if len(s1) + len(s2) != len(s3):
-        return False
-    if len(s1) == 0 and len(s2) == 0 and len(s3) == 0:
-        return True
-    dp = [[[False for i in range(len(s2) + 1)] for j in range(len(s1) + 1)] for k in range(len(s3) + 1)]
-    dp[0][0][0] = True
-    for i in range(1, len(s1) + 1):
-        if s1[i - 1] == s3[i - 1]:
-            dp[i][i][0] = dp[i - 1][i - 1][0]
-    for j in range(1, len(s2) + 1):
-        if s2[j - 1] == s3[j - 1]:
-            dp[j][0][j] = dp[j - 1][0][j - 1]
-
-    for k in range(2, len(s3) + 1):
-        for i in range(1, min(len(s1) + 1, k)):
-            j = k - i
-            if j <= len(s2):
-                if s1[i - 1] == s3[k - 1] and s2[j - 1] == s3[k - 1]:
-                    dp[k][i][j] = dp[k - 1][i - 1][j] or dp[k - 1][i][j - 1]
-                elif s1[i - 1] == s3[k - 1] and s2[j - 1] != s3[k - 1]:
-                    dp[k][i][j] = dp[k - 1][i - 1][j]
-                elif s1[i - 1] != s3[k - 1] and s2[j - 1] == s3[k - 1]:
-                    dp[k][i][j] = dp[k - 1][i][j - 1]
-                else:
-                    dp[k][i][j] = False
-
-    return dp[len(s3)][len(s1)][len(s2)]
