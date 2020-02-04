@@ -1,4 +1,4 @@
-# 力扣网刷图记录
+# 力扣网刷题记录
 
 # 扰乱字符串
 
@@ -70,6 +70,49 @@ def isScramble1(self, s1: str, s2: str) -> bool:
                         break
                 dp[k][i][j] = res
     return dp[len(s1)][0][0]  # 返回从下标为0开始长度为len(s1)的子串是否为扰乱字符串的结果
+```
 
+# 交错字符串
+
+题目描述见[这里](https://leetcode-cn.com/problems/interleaving-string/submissions/)
+
+# 解题思路
+
+如果s3由s1和s2交错组成，那么首先必须满足，len(s1)+len(s2)=len(s3)。其次，s3的最后一个字符要么等于s1的最后一个字符，要么等于s2的最后一个字符，或者都相等。同时问题转化成判断s3[:-1], s1[:-1], s2 或者s3[:-1], s1, s2[:-1]是否为交错字符串的规模更小的子问题。因此：可以归纳出该问题的最优子结构：
+
+设dp[k][i][j]表示长度为k的s3字符串是否由长度为i和j的s1和s2交错组成的情况。那么：
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=dp[k][i][j]=\left\{\begin{matrix}&space;false&space;&,&space;i&plus;j&space;\neq&space;k&space;\\&space;true&space;&,&space;i=j=k=0\\&space;dp[k-1][i-1][0]&space;&&space;,i=k,j=0,s1[i]=s3[k]&space;\\&space;dp[k-1][0][j-1]&space;&&space;,j=k,i=0,s2[j]=s3[k]&space;\\&space;dp[k-1][i-1][j]&space;&&space;,i&plus;j=k,s1[i]=s3[k],&space;s2[j]&space;\neq&space;s3[k]\\&space;dp[k-1][i][j-1]&space;&&space;,i&plus;j=k,s1[i]\neq&space;s3[k],s2[i]&space;=&space;s3[k]\\&space;dp[k-1][i-1][j]&space;\quad&space;or&space;\quad&space;dp[k-1][i][j-1]&space;&&space;,&space;i&plus;j=k,s1[i]=s3[k],&space;s2[j]=s3[k]&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?dp[k][i][j]=\left\{\begin{matrix}&space;false&space;&,&space;i&plus;j&space;\neq&space;k&space;\\&space;true&space;&,&space;i=j=k=0\\&space;dp[k-1][i-1][0]&space;&&space;,i=k,j=0,s1[i]=s3[k]&space;\\&space;dp[k-1][0][j-1]&space;&&space;,j=k,i=0,s2[j]=s3[k]&space;\\&space;dp[k-1][i-1][j]&space;&&space;,i&plus;j=k,s1[i]=s3[k],&space;s2[j]&space;\neq&space;s3[k]\\&space;dp[k-1][i][j-1]&space;&&space;,i&plus;j=k,s1[i]\neq&space;s3[k],s2[i]&space;=&space;s3[k]\\&space;dp[k-1][i-1][j]&space;\quad&space;or&space;\quad&space;dp[k-1][i][j-1]&space;&&space;,&space;i&plus;j=k,s1[i]=s3[k],&space;s2[j]=s3[k]&space;\end{matrix}\right." title="dp[k][i][j]=\left\{\begin{matrix} false &, i+j \neq k \\ true &, i=j=k=0\\ dp[k-1][i-1][0] & ,i=k,j=0,s1[i]=s3[k] \\ dp[k-1][0][j-1] & ,j=k,i=0,s2[j]=s3[k] \\ dp[k-1][i-1][j] & ,i+j=k,s1[i]=s3[k], s2[j] \neq s3[k]\\ dp[k-1][i][j-1] & ,i+j=k,s1[i]\neq s3[k],s2[i] = s3[k]\\ dp[k-1][i-1][j] \quad or \quad dp[k-1][i][j-1] & , i+j=k,s1[i]=s3[k], s2[j]=s3[k] \end{matrix}\right." /></a>
+
+代码如下：
+```python
+def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
+    if len(s1) + len(s2) != len(s3):
+        return False
+    if len(s1) == 0 and len(s2) == 0 and len(s3) == 0:
+        return True
+    dp = [[[False for i in range(len(s2) + 1)] for j in range(len(s1) + 1)] for k in range(len(s3) + 1)]
+    dp[0][0][0] = True
+    for i in range(1, len(s1) + 1):
+        if s1[i - 1] == s3[i - 1]:
+            dp[i][i][0] = dp[i - 1][i - 1][0]
+    for j in range(1, len(s2) + 1):
+        if s2[j - 1] == s3[j - 1]:
+            dp[j][0][j] = dp[j - 1][0][j - 1]
+
+    for k in range(2, len(s3) + 1):
+        for i in range(1, min(len(s1) + 1, k)):
+            j = k - i
+            if j <= len(s2):
+                if s1[i - 1] == s3[k - 1] and s2[j - 1] == s3[k - 1]:
+                    dp[k][i][j] = dp[k - 1][i - 1][j] or dp[k - 1][i][j - 1]
+                elif s1[i - 1] == s3[k - 1] and s2[j - 1] != s3[k - 1]:
+                    dp[k][i][j] = dp[k - 1][i - 1][j]
+                elif s1[i - 1] != s3[k - 1] and s2[j - 1] == s3[k - 1]:
+                    dp[k][i][j] = dp[k - 1][i][j - 1]
+                else:
+                    dp[k][i][j] = False
+
+    return dp[len(s3)][len(s1)][len(s2)]
 
 ```
