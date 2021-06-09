@@ -113,8 +113,31 @@ def sort_by_merge(data, start, end):
     data[start: end + 1] = copy
 
 
+def quick_sort(data, start, end):
+    if start < end:
+        i, j = start, end
+        now = data[start]
+        while i < j:
+            while i < j and data[j] >= now:
+                j -= 1
+            if i < j:
+                data[i] = data[j]
+                i += 1
+            while i < j and data[i] < now:
+                i += 1
+            if i < j:
+                data[j] = data[i]
+                j -= 1
+            data[i] = now
+            quick_sort(data, start, i-1)
+            quick_sort(data, i+1, end)
+
+
 if __name__ == '__main__':
     x = [1, 5, 4, 2, 3, 8, 11, 6, 2, 4, 3, 100, 16]
+    quick_sort(x, 0, len(x)-1)
+    print(x)
+    exit()
     sort_by_merge(x, 0, len(x) - 1)
     print(x)
     x = [1, 2, 3, 4, 5, 6, 7, 0]
